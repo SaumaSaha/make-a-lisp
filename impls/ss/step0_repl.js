@@ -1,7 +1,4 @@
-const readline = require("node:readline");
-const { stdin: input, stdout: output } = require("node:process");
-
-const rl = readline.createInterface({ input, output });
+const { rl } = require("./readline");
 
 const READ = (str) => str;
 const EVAL = (str) => str;
