@@ -6,6 +6,8 @@ const {
   MalNil,
   MalString,
   MalMap,
+  MalIdentifier,
+  MalKeyword,
 } = require("./types");
 
 class Reader {
@@ -38,12 +40,20 @@ const readAtom = (reader) => {
     return new MalValue(currentToken === "true"); // Convert to boolean value
   }
 
-  if (/^[\Wa-zA-Z]+$/.test(currentToken)) {
+  if (/^[a-zA-Z]+$/.test(currentToken)) {
+    return new MalIdentifier(currentToken);
+  }
+
+  if (/^[\W]+$/.test(currentToken)) {
     return new MalSymbol(currentToken); // If the token is all letters and symbols
   }
 
   if (/^".*"$/.test(currentToken)) {
     return new MalString(currentToken);
+  }
+
+  if (/^:/.test(currentToken)) {
+    return new MalKeyword(currentToken);
   }
 
   return new MalValue(parseInt(currentToken));
@@ -83,6 +93,7 @@ const tokenize = (input) => {
 const readStr = (input) => {
   const tokens = tokenize(input);
   const reader = new Reader(tokens);
+
   return readForm(reader);
 };
 
