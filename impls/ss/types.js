@@ -13,6 +13,10 @@ class MalList extends MalSeq {
     super(...args);
   }
 
+  isEmpty() {
+    return this.args.length === 0;
+  }
+
   prStr() {
     return super.prStr("(", ")");
   }
@@ -70,4 +74,13 @@ class MalNil {
   }
 }
 
-module.exports = { MalValue, MalSymbol, MalList, MalVector, MalNil, MalString, MalMap };
+module.exports = {
+  MalSeq,
+  MalValue,
+  MalSymbol,
+  MalList,
+  MalVector,
+  MalNil,
+  MalString,
+  MalMap,
+};

@@ -30,8 +30,8 @@ class Reader {
 const readAtom = (reader) => {
   const currentToken = reader.peek();
 
-  if (/^-?\d+$/.test(currentToken)) {
-    return new MalValue(parseInt(currentToken)); // If the token is all digits
+  if (currentToken === "nil") {
+    return new MalNil(); // If the token is all digits
   }
 
   if (currentToken === "true" || currentToken === "false") {
@@ -46,7 +46,7 @@ const readAtom = (reader) => {
     return new MalString(currentToken);
   }
 
-  return new MalNil();
+  return new MalValue(parseInt(currentToken));
 };
 
 const readList = (reader, terminator) => {
