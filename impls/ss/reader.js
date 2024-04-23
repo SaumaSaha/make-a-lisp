@@ -44,7 +44,7 @@ const readAtom = (reader) => {
     return new MalIdentifier(currentToken);
   }
 
-  if (/^[\W]+$/.test(currentToken)) {
+  if (/^[\W]+$|def!/.test(currentToken)) {
     return new MalSymbol(currentToken); // If the token is all letters and symbols
   }
 
@@ -88,6 +88,11 @@ const tokenize = (input) => {
   const regExp = /[\s,]*(~@|[\[\]{}()'`~^@]|"(?:\\.|[^\\"])*"?|;.*|[^\s\[\]{}('"`,;)]*)/g;
 
   return [...input.matchAll(regExp)].slice(0, -1).map((match) => match[1].trim());
+};
+
+const debugPrint = (val) => {
+  console.log(val);
+  return val;
 };
 
 const readStr = (input) => {

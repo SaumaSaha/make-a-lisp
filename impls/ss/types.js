@@ -74,7 +74,7 @@ class MalNil {
   }
 }
 
-class MalIdentifier extends MalValue {
+class MalIdentifier extends MalSymbol {
   constructor(value) {
     super(value);
   }
