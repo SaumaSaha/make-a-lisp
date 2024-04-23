@@ -4,7 +4,13 @@ const { readStr } = require("./reader");
 
 const rl = readline.createInterface({ input, output });
 
-const READ = (str) => readStr(str);
+const READ = (str) => {
+  try {
+    readStr(str);
+  } catch (e) {
+    console.log(e);
+  }
+};
 const EVAL = (str) => str;
 const PRINT = (str) => str;
 
