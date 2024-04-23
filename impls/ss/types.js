@@ -28,6 +28,16 @@ class MalVector extends MalSeq {
   }
 }
 
+class MalMap extends MalSeq {
+  constructor(...args) {
+    super(...args);
+  }
+
+  prStr() {
+    return super.prStr("{", "}");
+  }
+}
+
 class MalValue {
   constructor(value) {
     this.value = value;
@@ -48,10 +58,16 @@ class MalSymbol {
   }
 }
 
+class MalString extends MalSymbol {
+  constructor(value) {
+    super(value);
+  }
+}
+
 class MalNil {
   prStr() {
     return "nil";
   }
 }
 
-module.exports = { MalValue, MalSymbol, MalList, MalVector, MalNil };
+module.exports = { MalValue, MalSymbol, MalList, MalVector, MalNil, MalString, MalMap };

@@ -1,5 +1,12 @@
-const { prStr } = require("./printer");
-const { MalList, MalValue, MalSymbol, MalVector } = require("./types");
+const {
+  MalList,
+  MalValue,
+  MalSymbol,
+  MalVector,
+  MalNil,
+  MalString,
+  MalMap,
+} = require("./types");
 
 class Reader {
   #tokens;
@@ -23,7 +30,7 @@ class Reader {
 const readAtom = (reader) => {
   const currentToken = reader.peek();
 
-  if (/^\d+$/.test(currentToken)) {
+  if (/^-?\d+$/.test(currentToken)) {
     return new MalValue(parseInt(currentToken)); // If the token is all digits
   }
 
@@ -35,16 +42,18 @@ const readAtom = (reader) => {
     return new MalSymbol(currentToken); // If the token is all letters and symbols
   }
 
-  return MalNil();
+  if (/^".*"$/.test(currentToken)) {
+    return new MalString(currentToken);
+  }
+
+  return new MalNil();
 };
 
 const readList = (reader, terminator) => {
   const ast = [];
   while (reader.next()) {
     const currentToken = reader.peek();
-    if (currentToken === terminator) {
-      return terminator === ")" ? new MalList(...ast) : new MalVector(...ast);
-    }
+    if (currentToken === terminator) return ast;
     if (!currentToken) throw new Error("unbalanced");
     ast.push(readForm(reader));
   }
@@ -52,9 +61,17 @@ const readList = (reader, terminator) => {
 
 const readForm = (reader) => {
   const token = reader.peek();
-  if (token === "(") return readList(reader, ")");
-  if (token === "[") return readList(reader, "]");
-  return readAtom(reader);
+
+  switch (token) {
+    case "(":
+      return new MalList(...readList(reader, ")"));
+    case "[":
+      return new MalVector(...readList(reader, "]"));
+    case "{":
+      return new MalMap(...readList(reader, "}"));
+    default:
+      return readAtom(reader);
+  }
 };
 
 const tokenize = (input) => {
@@ -63,18 +80,10 @@ const tokenize = (input) => {
   return [...input.matchAll(regExp)].slice(0, -1).map((match) => match[1].trim());
 };
 
-const debugPrint = (value) => {
-  console.log(value);
-  return value;
-};
-
 const readStr = (input) => {
   const tokens = tokenize(input);
   const reader = new Reader(tokens);
-  const malType = readForm(reader);
-  prStr(malType);
-
-  return malType.prStr();
+  return readForm(reader);
 };
 
 module.exports = { readStr };
