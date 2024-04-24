@@ -7,6 +7,7 @@ const {
   MalString,
   MalMap,
   MalKeyword,
+  MalBool,
 } = require("./types");
 
 class Reader {
@@ -36,15 +37,15 @@ const readAtom = (reader) => {
   }
 
   if (currentToken === "true" || currentToken === "false") {
-    return new MalValue(currentToken === "true"); // Convert to boolean value
-  }
-
-  if (/^[\Wa-zA-Z]+$|def!|let*/.test(currentToken)) {
-    return new MalSymbol(currentToken); // If the token is all letters and symbols
+    return new MalBool(currentToken === "true"); // Convert to boolean value
   }
 
   if (/^".*"$/.test(currentToken)) {
     return new MalString(currentToken);
+  }
+
+  if (/^[\Wa-zA-Z]+$/.test(currentToken)) {
+    return new MalSymbol(currentToken); // If the token is all letters and symbols
   }
 
   if (/^:/.test(currentToken)) {
@@ -83,11 +84,6 @@ const tokenize = (input) => {
   const regExp = /[\s,]*(~@|[\[\]{}()'`~^@]|"(?:\\.|[^\\"])*"?|;.*|[^\s\[\]{}('"`,;)]*)/g;
 
   return [...input.matchAll(regExp)].slice(0, -1).map((match) => match[1].trim());
-};
-
-const debugPrint = (val) => {
-  console.log(val);
-  return val;
 };
 
 const readStr = (input) => {

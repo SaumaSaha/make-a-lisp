@@ -52,6 +52,12 @@ class MalValue {
   }
 }
 
+class MalBool extends MalValue {
+  constructor(value) {
+    super(value);
+  }
+}
+
 class MalSymbol {
   constructor(value) {
     this.value = value;
@@ -97,4 +103,5 @@ module.exports = {
   MalMap,
   MalKeyword,
   MalFunc,
+  MalBool,
 };
