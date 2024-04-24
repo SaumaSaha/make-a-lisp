@@ -74,7 +74,7 @@ class MalNil {
   }
 }
 
-class MalIdentifier extends MalSymbol {
+class MalFunc extends MalValue {
   constructor(value) {
     super(value);
   }
@@ -95,6 +95,6 @@ module.exports = {
   MalNil,
   MalString,
   MalMap,
-  MalIdentifier,
   MalKeyword,
+  MalFunc,
 };

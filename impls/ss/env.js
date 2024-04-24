@@ -12,16 +12,14 @@ class Env {
   }
 
   find(key) {
-    const env = this.#data[key] || this.#outer?.find(key);
-    if (!env) return this.#outer.find(key);
-    return env;
+    return this.#data[key] ? this : this.#outer?.find(key);
   }
 
   get(key) {
     const env = this.find(key);
 
-    if (!env) throw new Error("not found");
-    return env;
+    if (!env) throw new Error(`${key} not found`);
+    return env.#data[key];
   }
 }
 

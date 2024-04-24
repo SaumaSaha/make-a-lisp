@@ -6,11 +6,8 @@ const {
   MalList,
   MalValue,
   MalSymbol,
-  MalSeq,
   MalVector,
   MalMap,
-  MalIdentifier,
-  MalKeyword,
 } = require("./types");
 
 const rl = readline.createInterface({ input, output });
