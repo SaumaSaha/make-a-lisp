@@ -7,6 +7,15 @@ class Env {
     this.#data = data;
   }
 
+  createFunctionWithBinds(binds, exprs) {
+    const data = {};
+    binds.args.forEach((element, index) => {
+      data[element.value] = exprs[index];
+    });
+
+    return new Env(this, data);
+  }
+
   set(key, value) {
     this.#data[key] = value;
   }

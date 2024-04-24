@@ -66,11 +66,21 @@ const handleIf = (ast, replEnv) => {
   return test ? EVAL(then, replEnv) : EVAL(otherWise, replEnv);
 };
 
+const handleFn = (ast, replEnv) => {
+  const [_, parameters, body] = ast.args;
+  const fn = (args) => {
+    const newEnv = replEnv.createFunctionWithBinds(parameters, args);
+    return EVAL(body, newEnv);
+  };
+  return new MalFunc(fn);
+};
+
 const specialForms = {
   "def!": handleDef,
   "let*": handleLet,
   "do": handleDo,
   "if": handleIf,
+  "fn*": handleFn,
 };
 
 const handleSpecialForm = (ast, replEnv) => {

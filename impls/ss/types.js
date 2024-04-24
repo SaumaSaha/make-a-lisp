@@ -80,9 +80,13 @@ class MalNil {
   }
 }
 
-class MalFunc extends MalValue {
+class MalFunc {
   constructor(value) {
-    super(value);
+    this.value = value;
+  }
+
+  prStr() {
+    return "#<function>";
   }
 }
 
