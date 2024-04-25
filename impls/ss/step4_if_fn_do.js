@@ -12,30 +12,15 @@ const {
   MalFunc,
 } = require("./types");
 const { Env } = require("./env");
+const { createAndLoadEnv } = require("./core");
 
 const rl = readline.createInterface({ input, output });
 
-const replEnv = {
-  "+": (args) => new MalValue(args.reduce((a, b) => a + b)),
-  "-": (args) => new MalValue(args.reduce((a, b) => a - b)),
-  "*": (args) => new MalValue(args.reduce((a, b) => a * b)),
-  "/": (args) => new MalValue(args.reduce((a, b) => a / b)),
-  "=": ([a, b]) => a === b,
-  "<": ([a, b]) => a < b,
-  ">": ([a, b]) => a > b,
-  "<=": ([a, b]) => a <= b,
-  ">=": ([a, b]) => a >= b,
-};
-
-const env = new Env(null, { ...replEnv });
+const env = createAndLoadEnv();
 
 const addBinding = (key, value, env) => {
   const malValue = EVAL(value, env);
-  if (malValue instanceof MalFunc) {
-    env.set(key.value, malValue);
-    return malValue;
-  }
-  env.set(key.value, malValue.value);
+  env.set(key.value, malValue);
   return malValue;
 };
 
@@ -98,9 +83,7 @@ const isSpecialForm = (ast) => specialForms[ast.value[0].value];
 const evalAst = (ast, env) => {
   switch (true) {
     case ast instanceof MalSymbol:
-      const handler = env.get(ast.value);
-      if (handler instanceof MalFunc) return handler;
-      return new MalValue(handler);
+      return env.get(ast.value);
     case ast instanceof MalList:
       return ast.value.map((arg) => EVAL(arg, env));
     case ast instanceof MalVector:
@@ -115,15 +98,14 @@ const evalAst = (ast, env) => {
 const READ = (str) => readStr(str);
 
 const EVAL = (ast, replEnv) => {
-  console.log(ast);
   if (!(ast instanceof MalList)) return evalAst(ast, replEnv);
   if (ast instanceof MalList && ast.isEmpty()) return ast;
 
   if (isSpecialForm(ast)) return handleSpecialForm(ast, replEnv);
 
   const [fn, ...args] = evalAst(ast, replEnv);
-  if (fn instanceof MalFunc) return fn.value(args).value;
-  return fn.value(args.map((arg) => arg.value));
+  if (fn instanceof MalFunc) return fn.value(args);
+  return fn(args.map((arg) => arg.value));
 };
 
 const PRINT = (str) => prStr(str);

@@ -9,7 +9,6 @@ class Env {
 
   createEnvWithBinds(binds, exprs) {
     const env = new Env(this);
-    console.log(binds, exprs);
     binds.value.forEach((element, index) => {
       env.set(element.value, exprs[index]);
     });
