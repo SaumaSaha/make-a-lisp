@@ -1,20 +1,20 @@
 class MalSeq {
-  constructor(...args) {
-    this.args = args;
+  constructor(...value) {
+    this.value = value;
   }
 
   prStr(start, end) {
-    return `${start}${this.args.map((arg) => arg.prStr()).join(" ")}${end}`;
+    return `${start}${this.value.map((arg) => arg.prStr()).join(" ")}${end}`;
   }
 }
 
 class MalList extends MalSeq {
-  constructor(...args) {
-    super(...args);
+  constructor(...value) {
+    super(...value);
   }
 
   isEmpty() {
-    return this.args.length === 0;
+    return this.value.length === 0;
   }
 
   prStr() {
@@ -23,8 +23,8 @@ class MalList extends MalSeq {
 }
 
 class MalVector extends MalSeq {
-  constructor(...args) {
-    super(...args);
+  constructor(...value) {
+    super(...value);
   }
 
   prStr() {
@@ -33,8 +33,8 @@ class MalVector extends MalSeq {
 }
 
 class MalMap extends MalSeq {
-  constructor(...args) {
-    super(...args);
+  constructor(...value) {
+    super(...value);
   }
 
   prStr() {

@@ -2,13 +2,7 @@ const readline = require("node:readline");
 const { stdin: input, stdout: output } = require("node:process");
 const { readStr } = require("./reader");
 const { prStr } = require("./printer");
-const {
-  MalList,
-  MalValue,
-  MalSymbol,
-  MalVector,
-  MalMap,
-} = require("./types");
+const { MalList, MalValue, MalSymbol, MalVector, MalMap } = require("./types");
 
 const rl = readline.createInterface({ input, output });
 
@@ -26,11 +20,11 @@ const evalAst = (ast, replEnv) => {
       if (handler) return handler;
       throw new Error("no value found");
     case ast instanceof MalList:
-      return ast.args.map((arg) => EVAL(arg, replEnv));
+      return ast.value.map((arg) => EVAL(arg, replEnv));
     case ast instanceof MalVector:
-      return new MalVector(...ast.args.map((arg) => EVAL(arg, replEnv)));
+      return new MalVector(...ast.value.map((arg) => EVAL(arg, replEnv)));
     case ast instanceof MalMap:
-      return new MalMap(...ast.args.map((arg) => EVAL(arg, replEnv)));
+      return new MalMap(...ast.value.map((arg) => EVAL(arg, replEnv)));
     default:
       return ast;
   }

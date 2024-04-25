@@ -31,18 +31,22 @@ const env = new Env(null, { ...replEnv });
 
 const addBinding = (key, value, env) => {
   const malValue = EVAL(value, env);
+  if (malValue instanceof MalFunc) {
+    env.set(key.value, malValue);
+    return malValue;
+  }
   env.set(key.value, malValue.value);
   return malValue;
 };
 
 const handleDef = (ast, replEnv) => {
-  const [_, sec, last] = ast.args;
+  const [_, sec, last] = ast.value;
   return addBinding(sec, last, replEnv);
 };
 
 const handleLet = (ast, replEnv) => {
   const newEnv = new Env(replEnv);
-  const [_, sec, last] = ast.args;
+  const [_, sec, last] = ast.value;
   for (let index = 0; index < sec.args.length; index += 2) {
     const key = sec.args[index];
     const value = sec.args[index + 1];
@@ -52,7 +56,7 @@ const handleLet = (ast, replEnv) => {
 };
 
 const handleDo = (ast, replEnv) => {
-  const [_, ...rest] = ast.args;
+  const [_, ...rest] = ast.value;
   const list = new MalVector(...rest);
   const evalList = EVAL(list, replEnv);
 
@@ -60,16 +64,16 @@ const handleDo = (ast, replEnv) => {
 };
 
 const handleIf = (ast, replEnv) => {
-  const [_, condition, then, otherWise] = ast.args;
+  const [_, condition, then, otherWise] = ast.value;
   const test = EVAL(condition, replEnv);
 
   return test ? EVAL(then, replEnv) : EVAL(otherWise, replEnv);
 };
 
 const handleFn = (ast, replEnv) => {
-  const [_, parameters, body] = ast.args;
+  const [_, parameters, body] = ast.value;
   const fn = (args) => {
-    const newEnv = replEnv.createFunctionWithBinds(parameters, args);
+    const newEnv = replEnv.createEnvWithBinds(parameters, args);
     return EVAL(body, newEnv);
   };
   return new MalFunc(fn);
@@ -84,24 +88,25 @@ const specialForms = {
 };
 
 const handleSpecialForm = (ast, replEnv) => {
-  const first = ast.args[0].value;
+  const first = ast.value[0].value;
   const specialFormHandler = specialForms[first];
   return specialFormHandler(ast, replEnv);
 };
 
-const isSpecialForm = (ast) => specialForms[ast.args[0].value];
+const isSpecialForm = (ast) => specialForms[ast.value[0].value];
 
 const evalAst = (ast, env) => {
   switch (true) {
     case ast instanceof MalSymbol:
       const handler = env.get(ast.value);
-      if (handler) return new MalFunc(handler);
+      if (handler instanceof MalFunc) return handler;
+      return new MalValue(handler);
     case ast instanceof MalList:
-      return ast.args.map((arg) => EVAL(arg, env));
+      return ast.value.map((arg) => EVAL(arg, env));
     case ast instanceof MalVector:
-      return new MalVector(...ast.args.map((arg) => EVAL(arg, env)));
+      return new MalVector(...ast.value.map((arg) => EVAL(arg, env)));
     case ast instanceof MalMap:
-      return new MalMap(...ast.args.map((arg) => EVAL(arg, env)));
+      return new MalMap(...ast.value.map((arg) => EVAL(arg, env)));
     default:
       return ast;
   }
@@ -110,12 +115,14 @@ const evalAst = (ast, env) => {
 const READ = (str) => readStr(str);
 
 const EVAL = (ast, replEnv) => {
+  console.log(ast);
   if (!(ast instanceof MalList)) return evalAst(ast, replEnv);
   if (ast instanceof MalList && ast.isEmpty()) return ast;
 
   if (isSpecialForm(ast)) return handleSpecialForm(ast, replEnv);
 
   const [fn, ...args] = evalAst(ast, replEnv);
+  if (fn instanceof MalFunc) return fn.value(args).value;
   return fn.value(args.map((arg) => arg.value));
 };
 
