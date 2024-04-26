@@ -18,7 +18,7 @@ const addBinding = (key, value, env) => {
 
 const handleDef = (ast, replEnv) => {
   const [_, sec, last] = ast.value;
-  return { last: addBinding(sec, last, replEnv), newEnv: replEnv };
+  return { ast: addBinding(sec, last, replEnv), env: replEnv };
 };
 
 const handleLet = (ast, replEnv) => {
@@ -29,7 +29,7 @@ const handleLet = (ast, replEnv) => {
     const value = sec.value[index + 1];
     addBinding(key, value, newEnv);
   }
-  return !last ? { last: new MalNil(), newEnv: replEnv } : { last, newEnv };
+  return !last ? { ast: new MalNil(), env: replEnv } : { ast: last, env: newEnv };
 };
 
 const handleDo = (ast, replEnv) => {
@@ -37,7 +37,7 @@ const handleDo = (ast, replEnv) => {
   const list = new MalVector(...rest.slice(0, -1));
   EVAL(list, replEnv);
 
-  return { last: rest.at(-1), newEnv: replEnv };
+  return { ast: rest.at(-1), env: replEnv };
 };
 
 const handleIf = (ast, replEnv) => {
@@ -45,13 +45,13 @@ const handleIf = (ast, replEnv) => {
   const test = EVAL(condition, replEnv);
 
   return test.value === false
-    ? { last: otherWise, newEnv: replEnv }
-    : { last: then, newEnv: replEnv };
+    ? { ast: otherWise, env: replEnv }
+    : { ast: then, env: replEnv };
 };
 
 const handleFn = (ast, replEnv) => {
   const [_, parameters, body] = ast.value;
-  return { last: new MalFunc(parameters, body, replEnv), newEnv: replEnv };
+  return { ast: new MalFunc(parameters, body, replEnv), env: replEnv };
 };
 
 const specialForms = {
@@ -94,9 +94,9 @@ const EVAL = (ast, replEnv) => {
 
     switch (true) {
       case isSpecialForm(ast) !== undefined:
-        const { last, newEnv } = handleSpecialForm(ast, replEnv);
-        ast = last;
-        replEnv = newEnv;
+        const { ast: newAst, env } = handleSpecialForm(ast, replEnv);
+        ast = newAst;
+        replEnv = env;
         break;
 
       default:
