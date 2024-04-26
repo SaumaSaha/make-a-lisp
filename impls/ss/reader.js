@@ -48,11 +48,11 @@ const readAtom = (reader) => {
     return new MalString(currentToken);
   }
 
-  if (/^[\Wa-zA-Z]+$/.test(currentToken)) {
-    return new MalSymbol(currentToken); // If the token is all letters and symbols
+  if (/^\d+$/.test(currentToken)) {
+    return new MalValue(parseInt(currentToken));
   }
 
-  return new MalValue(parseInt(currentToken));
+  return new MalSymbol(currentToken); // If the token is all letters and symbols
 };
 
 const readList = (reader, terminator) => {

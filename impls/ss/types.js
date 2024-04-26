@@ -84,8 +84,10 @@ class MalNil extends MalValue {
 }
 
 class MalFunc {
-  constructor(value) {
-    this.value = value;
+  constructor(parameters, ast, env) {
+    this.parameters = parameters;
+    this.ast = ast;
+    this.env = env;
   }
 
   prStr() {

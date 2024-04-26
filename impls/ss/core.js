@@ -26,8 +26,6 @@ const ns = {
   "list?": (args) => new MalBool(args[0] instanceof MalList),
   "empty?": (args) => new MalBool(args[0].value.length === 0),
   "count": (args) => new MalValue(args[0].value.length),
-  "pr-str": (args) =>
-    pr_str(new MalString(args.map((x) => pr_str(x, true)).join(" ")), true),
 };
 
 const createAndLoadEnv = () => {
