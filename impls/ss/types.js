@@ -74,7 +74,10 @@ class MalString extends MalValue {
   }
 }
 
-class MalNil {
+class MalNil extends MalValue {
+  constructor() {
+    super(false);
+  }
   prStr() {
     return "nil";
   }

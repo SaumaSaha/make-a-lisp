@@ -40,16 +40,16 @@ const readAtom = (reader) => {
     return new MalBool(currentToken === "true"); // Convert to boolean value
   }
 
+  if (/^:/.test(currentToken)) {
+    return new MalKeyword(currentToken);
+  }
+
   if (/^".*"$/.test(currentToken)) {
     return new MalString(currentToken);
   }
 
   if (/^[\Wa-zA-Z]+$/.test(currentToken)) {
     return new MalSymbol(currentToken); // If the token is all letters and symbols
-  }
-
-  if (/^:/.test(currentToken)) {
-    return new MalKeyword(currentToken);
   }
 
   return new MalValue(parseInt(currentToken));

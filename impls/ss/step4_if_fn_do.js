@@ -2,15 +2,7 @@ const readline = require("node:readline");
 const { stdin: input, stdout: output } = require("node:process");
 const { readStr } = require("./reader");
 const { prStr } = require("./printer");
-const {
-  MalList,
-  MalValue,
-  MalSymbol,
-  MalVector,
-  MalMap,
-  MalNil,
-  MalFunc,
-} = require("./types");
+const { MalList, MalSymbol, MalVector, MalMap, MalNil, MalFunc } = require("./types");
 const { Env } = require("./env");
 const { createAndLoadEnv } = require("./core");
 
@@ -32,9 +24,9 @@ const handleDef = (ast, replEnv) => {
 const handleLet = (ast, replEnv) => {
   const newEnv = new Env(replEnv);
   const [_, sec, last] = ast.value;
-  for (let index = 0; index < sec.args.length; index += 2) {
-    const key = sec.args[index];
-    const value = sec.args[index + 1];
+  for (let index = 0; index < sec.value.length; index += 2) {
+    const key = sec.value[index];
+    const value = sec.value[index + 1];
     addBinding(key, value, newEnv);
   }
   return !last ? new MalNil() : EVAL(last, newEnv);
@@ -45,14 +37,14 @@ const handleDo = (ast, replEnv) => {
   const list = new MalVector(...rest);
   const evalList = EVAL(list, replEnv);
 
-  return evalList.args.at(-1);
+  return evalList.value.at(-1);
 };
 
 const handleIf = (ast, replEnv) => {
   const [_, condition, then, otherWise] = ast.value;
   const test = EVAL(condition, replEnv);
 
-  return test ? EVAL(then, replEnv) : EVAL(otherWise, replEnv);
+  return test.value === false ? EVAL(otherWise, replEnv) : EVAL(then, replEnv);
 };
 
 const handleFn = (ast, replEnv) => {
@@ -105,12 +97,14 @@ const EVAL = (ast, replEnv) => {
 
   const [fn, ...args] = evalAst(ast, replEnv);
   if (fn instanceof MalFunc) return fn.value(args);
-  return fn(args.map((arg) => arg.value));
+  return fn(args);
 };
 
 const PRINT = (str) => prStr(str);
 
 const rep = (str) => PRINT(EVAL(READ(str), env));
+
+rep("(def! not (fn* (a) (if a false true)))");
 
 const repl = () => {
   rl.question("user> ", (input) => {
